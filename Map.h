@@ -2,13 +2,13 @@
 #define _MAP_H_
 #include <iostream>
 namespace cop3530{
-template <typename K, typename V, bool (*comparison_fn())(K key1)(K key2)>
+template <typename K, typename V, bool (*comparison_fn)(K key1, K key2), bool (*equality_fn)(K key1, K key2)>
 class Map
 {
 public:
   virtual void insert (K key, V val) = 0;
-  virtual V remove(K key) = 0;
-  virtual V& lookup(K key) = 0;
+  // virtual V remove(K key) = 0;
+  // virtual V& lookup(K key) = 0;
   // virtual bool contains(K key) = 0;
   // virtual bool is_empty() = 0;
   // virtual bool is_full() = 0;
