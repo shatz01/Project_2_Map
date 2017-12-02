@@ -1,7 +1,8 @@
 #ifndef _MAP_H_
 #define _MAP_H_
+#include <iostream>
 namespace cop3530{
-template <typename K, typename V, (*comparison_fn)(E key1)(E key2), (*equality_fn)(E key1)(E key2)>
+template <typename K, typename V, bool (*comparison_fn())(K key1)(K key2)>
 class Map
 {
 public:
