@@ -10,7 +10,7 @@ public:
   // virtual V remove(K key) = 0;
   // virtual V& lookup(K key) = 0;
   // virtual bool contains(K key) = 0;
-  // virtual bool is_empty() = 0;
+  virtual bool is_empty() = 0;
   // virtual bool is_full() = 0;
   // virtual size_t size() = 0; // 	returns the number of key-value pairs in the map a size_t.
   // virtual void clear() = 0; // removes all key-value pairs from the map

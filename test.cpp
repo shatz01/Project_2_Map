@@ -16,6 +16,14 @@ int main(){
 
   BSTLEAF<int, char, comparison_fn, equality_fn > leaf_tree;
   leaf_tree.insert(5, 'a');
+  leaf_tree.insert(6, 'b');
+  leaf_tree.insert(4, 'c');
+  leaf_tree.insert(2, 'd');
+  leaf_tree.insert(4, 'e');
+  leaf_tree.insert(7, 'z');
+  leaf_tree.print_inorder();
+
+  // std::cout << leaf_tree.lookup(6) << std::endl;
 
   // cop3530::BSTLEAF<int, int, comparison_fn, eq
 
