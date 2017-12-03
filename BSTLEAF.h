@@ -30,6 +30,11 @@ public:
   void print_inorder();
   void r_print_inorder(Node *&rt);
   Node*& find_node(Node *&rt, K key);
+  int num_children(Node *curr);
+  Node*& find_parent(Node *&rt, K key);
+  bool is_l_of_parent(Node *child, Node *parent);
+  bool has_left(Node *curr);
+  bool has_right(Node *curr);
 
 private:
   Node *root;
@@ -143,7 +148,10 @@ V& BSTLEAF<K, V, comparison_fn, equality_fn>::lookup(K key)
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
 V BSTLEAF<K, V, comparison_fn, equality_fn>::remove(K key)
 {
-  Node *node_to_remove = find_node(root, key)
+  Node *node_to_remove = find_node(root, key);
+  Node *node_to_removes_parent = find_parent(root, node_to_remove->key);
+  bool l_of_parent = is_l_of_parent(node_to_remove, node_to_removes_parent);
+
   V removed_val = node_to_remove->val;
 
   // 3 cases
@@ -151,9 +159,24 @@ V BSTLEAF<K, V, comparison_fn, equality_fn>::remove(K key)
   {
     case 0: delete node_to_remove;
             node_to_remove = nullptr;
-    case 1: // find previous node, write a function for it.
-  }
+            break;
 
+    case 1: if (l_of_parent)
+              if (has_left(node_to_remove))
+                node_to_removes_parent->l = node_to_remove->l;
+              else
+                node_to_removes_parent->l = node_to_remove->r;
+            else
+              if (has_left(node_to_remove))
+                node_to_removes_parent->r = node_to_remove->l;
+              else
+                node_to_removes_parent->r = node_to_remove->r;
+            delete node_to_remove;
+            break;
+
+    // case 2:
+  }
+  return removed_val;
 }
 
 // --- num_children --- //
@@ -166,6 +189,49 @@ int BSTLEAF<K, V, comparison_fn, equality_fn>::num_children(Node *curr)
     return 1;
   else // node has no children
     return 0;
+}
+
+// --- find_parent --- //
+template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
+typename BSTLEAF<K, V, comparison_fn, equality_fn>::Node*& BSTLEAF<K, V, comparison_fn, equality_fn>::find_parent(Node *&rt, K key)
+{
+  // we will only look for its parent if it has more than 1 node in tree
+  if(rt->l)
+  {
+    if(equality_fn((rt->l)->key, key))
+      return rt;
+  }
+  if (rt->r) {
+    if(equality_fn((rt->r)->key, key))
+      return rt;
+  }
+  return (comparison_fn(key, rt->key) ? find_node(rt->l, key) : find_node(rt->r, key));
+}
+
+// --- is_l_of_parent --- //
+template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
+bool BSTLEAF<K, V, comparison_fn, equality_fn>::is_l_of_parent(Node *child, Node *parent)
+{
+  if (parent->l)
+  {
+    if((parent->l)->key == child->key)
+      return true;
+  }
+  return false;
+}
+
+// --- has_left --- //
+template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
+bool BSTLEAF<K, V, comparison_fn, equality_fn>::has_left(Node *curr)
+{
+  return curr->l;
+}
+
+// --- has_right --- //
+template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
+bool BSTLEAF<K, V, comparison_fn, equality_fn>::has_right(Node *curr)
+{
+  return curr->r;
 }
 
 

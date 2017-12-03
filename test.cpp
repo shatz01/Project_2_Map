@@ -19,8 +19,9 @@ int main(){
   leaf_tree.insert(6, 'b');
   leaf_tree.insert(4, 'c');
   leaf_tree.insert(2, 'd');
-  leaf_tree.insert(4, 'e');
-  leaf_tree.insert(7, 'z');
+  // leaf_tree.insert(4, 'e');
+  // leaf_tree.insert(7, 'z');
+  leaf_tree.remove(4);
   leaf_tree.print_inorder();
 
   // std::cout << leaf_tree.lookup(6) << std::endl;
