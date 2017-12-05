@@ -14,15 +14,19 @@ int main(){
   // cop3530::Map<int, char, (*comparison_fn)(const int& a, const int& b), (*equality_fn)(const int& a, const int& b) > *map = new cop3530::BSTLEAF<int, char, (*comparison_fn)(const int& a, const int& b), (*equality_fn)(const int& a, const int& b)>();
 
 
-  BSTLEAF<int, char, comparison_fn, equality_fn > leaf_tree;
-  leaf_tree.insert(5, 'a');
-  leaf_tree.insert(6, 'b');
-  leaf_tree.insert(4, 'c');
-  leaf_tree.insert(2, 'd');
-  // leaf_tree.insert(4, 'e');
-  // leaf_tree.insert(7, 'z');
-  leaf_tree.remove(4);
-  leaf_tree.print_inorder();
+  // BSTLEAF<int, char, comparison_fn, equality_fn > leaf_tree;
+  cop3530::Map<int, char, comparison_fn, equality_fn> *tree  = new cop3530::BSTLEAF<int, char, comparison_fn, equality_fn>();
+  tree->insert(10, 'a');
+  tree->insert(7, 'b');
+  tree->insert(13, 'c');
+  tree->insert(14, 'f');
+  tree->insert(12, 'e');
+  tree->remove(13);
+  std::cout << "size: "<< tree->size() << std::endl;
+
+  // char *arr = tree->contents();
+  tree->print_inorder();
+  std::cout << std::endl;
 
   // std::cout << leaf_tree.lookup(6) << std::endl;
 
