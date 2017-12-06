@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "BSTLEAF.h"
+#include "BSTROOT.h"
 
 #include <iostream>
 
@@ -16,7 +16,7 @@ bool equality_fn(int a, int b) {
 SCENARIO ("TEST 1") {
 	GIVEN ("Map with just 3 elements in it. 1 parent with 2 children.") {
 
-		cop3530::Map<int, char, comparison_fn, equality_fn> *tree  = new cop3530::BSTLEAF<int, char, comparison_fn, equality_fn>();
+		cop3530::Map<int, char, comparison_fn, equality_fn> *tree  = new cop3530::BSTROOT<int, char, comparison_fn, equality_fn>();
 
     REQUIRE(tree->size() == 0);
 

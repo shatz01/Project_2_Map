@@ -14,6 +14,8 @@ public:
   virtual bool is_empty() = 0;
   virtual V* contents() = 0;
   virtual void print_inorder() = 0;
+  virtual void print_root() = 0;
+  virtual V& lookup(K key) = 0;
   // virtual bool is_full() = 0;
   // virtual void clear() = 0; // removes all key-value pairs from the map
   // virtual size_t height() = 0;

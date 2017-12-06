@@ -1,5 +1,5 @@
-#ifndef _BSTLEAF_H_
-#define _BSTLEAF_H_
+#ifndef _BSTROOT_H_
+#define _BSTROOT_H_
 #include <iostream>
 #include "Map.h"
 namespace cop3530{
@@ -8,7 +8,7 @@ namespace cop3530{
 
 
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2), bool (*equality_fn)( K key1 ,  K key2 )>
-class BSTLEAF : public Map<K,V,comparison_fn, equality_fn>
+class BSTROOT : public Map<K,V,comparison_fn, equality_fn>
 {
 private:
   struct Node
@@ -21,7 +21,7 @@ private:
   };
 
 public:
-  BSTLEAF();
+  BSTROOT();
   void insert (K key, V val);
   void r_insert(Node *&rt, K key, V val);
   V remove(K key);
@@ -41,29 +41,37 @@ public:
   void r_contents(Node *rt, V *arr, size_t &i);
   void ext_remove(Node *&rt);
   Node*& smallest_node(Node *&rt);
+  void rotate_left(Node *&rt);
+  void rotate_right(Node *&rt);
+  void print_root();
 
 private:
   Node *root;
 
 };
 
-
-
 // --- node constructor with initializer list --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-BSTLEAF<K, V, comparison_fn, equality_fn>::Node::Node(K key_a, V val_a) : key(key_a), val(val_a) {}
+BSTROOT<K, V, comparison_fn, equality_fn>::Node::Node(K key_a, V val_a) : key(key_a), val(val_a) {}
 
 
 // --- constructor --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-BSTLEAF<K, V, comparison_fn, equality_fn>::BSTLEAF()
+BSTROOT<K, V, comparison_fn, equality_fn>::BSTROOT()
 {
   root = nullptr;
 }
 
+// --- print_root --- //
+template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
+void BSTROOT<K, V, comparison_fn, equality_fn>::print_root()
+{
+  std::cout << "Root: " << root->val << std::endl;
+}
+
 // --- insert --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-void BSTLEAF<K, V, comparison_fn, equality_fn>::insert(K key, V val)
+void BSTROOT<K, V, comparison_fn, equality_fn>::insert(K key, V val)
 {
   r_insert(root, key, val);
 
@@ -71,38 +79,70 @@ void BSTLEAF<K, V, comparison_fn, equality_fn>::insert(K key, V val)
 
 // --- r_insert --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-void BSTLEAF<K, V, comparison_fn, equality_fn>::r_insert(Node *&rt, K key, V val)
+void BSTROOT<K, V, comparison_fn, equality_fn>::r_insert(Node *&rt, K key, V val)
 {
-
-  // if (!rt) // base case
-  //   rt = new Node(key, val);
-  // else
-  //   if (comparison_fn(key, rt->key))
-  //     r_insert(rt->l, key, val);
-  //   else
-  //     r_insert(rt->r, key, val);
-
-
   if (!rt){
     rt = new Node(key, val);
+    return;
   } else {
     if (comparison_fn(key, rt->key)){
       r_insert(rt->l, key, val);
+      rotate_right(rt);
     }
     else {
       r_insert(rt->r, key, val);
+      rotate_left(rt);
     }
   }
-
-
-
-
-
 }
+
+// --- rotate_left --- //
+template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
+void BSTROOT<K, V, comparison_fn, equality_fn>::rotate_left(Node *&rt)
+{
+  if( !rt->r ) // this if return is only because of the case inserting 1, 5, 3
+    return;
+
+  Node *tmp = rt;
+  rt = rt->r;
+  tmp->r = rt->l;
+  rt->l = tmp;
+
+
+  // Node *tmp = rt->r;
+  // if (tmp->l)
+  //   rt->r = tmp->l;
+  // else
+  //   rt->r = nullptr;
+  // tmp->l = rt;
+  // root = tmp;
+}
+
+// --- rotate_right --- //
+template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
+void BSTROOT<K, V, comparison_fn, equality_fn>::rotate_right(Node *&rt)
+{
+  if( !rt->l ) // this if return is only because of the case inserting 1, 5, 3
+    return;
+
+  Node *tmp = rt;
+  rt = rt->l;
+  tmp->l = rt->r;
+  rt->r = tmp;
+  // Node *tmp = rt->l;
+  // if (tmp->r)
+  //   rt->l = tmp->r;
+  // else
+  //   rt->l = nullptr;
+  // tmp->r = rt;
+  // root = tmp;
+}
+
+
 
 // --- is_empty --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-bool BSTLEAF<K, V, comparison_fn, equality_fn>::is_empty()
+bool BSTROOT<K, V, comparison_fn, equality_fn>::is_empty()
 {
   return (!root);
 }
@@ -110,7 +150,7 @@ bool BSTLEAF<K, V, comparison_fn, equality_fn>::is_empty()
 
 // --- print_inorder --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-void BSTLEAF<K, V, comparison_fn, equality_fn>::print_inorder()
+void BSTROOT<K, V, comparison_fn, equality_fn>::print_inorder()
 {
   r_print_inorder(root);
 }
@@ -118,7 +158,7 @@ void BSTLEAF<K, V, comparison_fn, equality_fn>::print_inorder()
 
 // --- r_ print_inorder --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-void BSTLEAF<K, V, comparison_fn, equality_fn>::r_print_inorder(Node *&rt)
+void BSTROOT<K, V, comparison_fn, equality_fn>::r_print_inorder(Node *&rt)
 {
   // std::cout << "got here tho" << std::endl;
   if (!rt)
@@ -135,10 +175,10 @@ void BSTLEAF<K, V, comparison_fn, equality_fn>::r_print_inorder(Node *&rt)
 
 // --- find_node --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-typename BSTLEAF<K, V, comparison_fn, equality_fn>::Node*& BSTLEAF<K, V, comparison_fn, equality_fn>::find_node(Node *&rt, K key)
+typename BSTROOT<K, V, comparison_fn, equality_fn>::Node*& BSTROOT<K, V, comparison_fn, equality_fn>::find_node(Node *&rt, K key)
 {
   if (!rt) // if we have gotten to the child of a leaf node, throw an error
-    throw std::runtime_error("BSTLEAF.find_node(): key not found");
+    throw std::runtime_error("BSTROOT.find_node(): key not found");
   if(equality_fn(rt->key, key))
     return rt;
   else
@@ -147,14 +187,14 @@ typename BSTLEAF<K, V, comparison_fn, equality_fn>::Node*& BSTLEAF<K, V, compari
 
 // --- lookup --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-V& BSTLEAF<K, V, comparison_fn, equality_fn>::lookup(K key)
+V& BSTROOT<K, V, comparison_fn, equality_fn>::lookup(K key)
 {
   return (find_node(root, key)->val);
 }
 
 // --- remove --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-V BSTLEAF<K, V, comparison_fn, equality_fn>::remove(K key)
+V BSTROOT<K, V, comparison_fn, equality_fn>::remove(K key)
 {
   Node *node_to_remove = find_node(root, key);
   Node *node_to_removes_parent = find_parent(root, node_to_remove->key);
@@ -203,7 +243,7 @@ V BSTLEAF<K, V, comparison_fn, equality_fn>::remove(K key)
 
 // --- ext_remove --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-void BSTLEAF<K, V, comparison_fn, equality_fn>::ext_remove(Node *&rt)
+void BSTROOT<K, V, comparison_fn, equality_fn>::ext_remove(Node *&rt)
 {
   Node *node_to_remove = rt;
   Node *node_to_removes_parent = find_parent(root, rt->key);
@@ -235,7 +275,7 @@ void BSTLEAF<K, V, comparison_fn, equality_fn>::ext_remove(Node *&rt)
 
 // --- smallest_node --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-typename BSTLEAF<K, V, comparison_fn, equality_fn>::Node*& BSTLEAF<K, V, comparison_fn, equality_fn>::smallest_node(Node *&rt)
+typename BSTROOT<K, V, comparison_fn, equality_fn>::Node*& BSTROOT<K, V, comparison_fn, equality_fn>::smallest_node(Node *&rt)
 {
   // just need to traverse as far left as possible
   if(!rt->l)
@@ -246,7 +286,7 @@ typename BSTLEAF<K, V, comparison_fn, equality_fn>::Node*& BSTLEAF<K, V, compari
 
 // --- num_children --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-int BSTLEAF<K, V, comparison_fn, equality_fn>::num_children(Node *curr)
+int BSTROOT<K, V, comparison_fn, equality_fn>::num_children(Node *curr)
 {
   if(curr->l && curr->r) // this node has 2 children
     return 2;
@@ -258,7 +298,7 @@ int BSTLEAF<K, V, comparison_fn, equality_fn>::num_children(Node *curr)
 
 // --- find_parent --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-typename BSTLEAF<K, V, comparison_fn, equality_fn>::Node*& BSTLEAF<K, V, comparison_fn, equality_fn>::find_parent(Node *&rt, K key)
+typename BSTROOT<K, V, comparison_fn, equality_fn>::Node*& BSTROOT<K, V, comparison_fn, equality_fn>::find_parent(Node *&rt, K key)
 {
   // we will only look for its parent if it has more than 1 node in tree
   if(rt->l)
@@ -275,7 +315,7 @@ typename BSTLEAF<K, V, comparison_fn, equality_fn>::Node*& BSTLEAF<K, V, compari
 
 // --- is_l_of_parent --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-bool BSTLEAF<K, V, comparison_fn, equality_fn>::is_l_of_parent(Node *child, Node *parent)
+bool BSTROOT<K, V, comparison_fn, equality_fn>::is_l_of_parent(Node *child, Node *parent)
 {
   if (parent->l)
   {
@@ -287,21 +327,21 @@ bool BSTLEAF<K, V, comparison_fn, equality_fn>::is_l_of_parent(Node *child, Node
 
 // --- has_left --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-bool BSTLEAF<K, V, comparison_fn, equality_fn>::has_left(Node *curr)
+bool BSTROOT<K, V, comparison_fn, equality_fn>::has_left(Node *curr)
 {
   return curr->l;
 }
 
 // --- has_right --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-bool BSTLEAF<K, V, comparison_fn, equality_fn>::has_right(Node *curr)
+bool BSTROOT<K, V, comparison_fn, equality_fn>::has_right(Node *curr)
 {
   return curr->r;
 }
 
 // --- size --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-size_t BSTLEAF<K, V, comparison_fn, equality_fn>::size()
+size_t BSTROOT<K, V, comparison_fn, equality_fn>::size()
 {
 
   size_t num_nodes = 0;
@@ -312,7 +352,7 @@ size_t BSTLEAF<K, V, comparison_fn, equality_fn>::size()
 
 // --- r_size --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-size_t BSTLEAF<K, V, comparison_fn, equality_fn>::r_size(Node *rt)
+size_t BSTROOT<K, V, comparison_fn, equality_fn>::r_size(Node *rt)
 {
   size_t num_nodes = 1;
   if (rt->l)
@@ -325,7 +365,7 @@ size_t BSTLEAF<K, V, comparison_fn, equality_fn>::r_size(Node *rt)
 
 // --- contents --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-V* BSTLEAF<K, V, comparison_fn, equality_fn>::contents()
+V* BSTROOT<K, V, comparison_fn, equality_fn>::contents()
 {
   size_t size_contents = size();
   V *arr = new V[size_contents];
@@ -337,7 +377,7 @@ V* BSTLEAF<K, V, comparison_fn, equality_fn>::contents()
 
 // --- r_contents --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-void BSTLEAF<K, V, comparison_fn, equality_fn>::r_contents(Node *rt, V* arr, size_t &i)
+void BSTROOT<K, V, comparison_fn, equality_fn>::r_contents(Node *rt, V* arr, size_t &i)
 {
 
   if (!rt)
