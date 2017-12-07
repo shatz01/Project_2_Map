@@ -31,7 +31,7 @@ public:
   void r_print_inorder(Node *&rt);
   Node*& find_node(Node *&rt, K key);
   int num_children(Node *curr);
-  Node*& find_parent(Node *&rt, K key);
+  Node* find_parent(Node *&rt, K key);
   bool is_l_of_parent(Node *child, Node *parent);
   bool has_left(Node *curr);
   bool has_right(Node *curr);
@@ -157,48 +157,93 @@ template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool
 V BSTLEAF<K, V, comparison_fn, equality_fn>::remove(K key)
 {
   Node *node_to_remove = find_node(root, key);
-  Node *node_to_removes_parent = find_parent(root, node_to_remove->key);
-  bool l_of_parent = is_l_of_parent(node_to_remove, node_to_removes_parent);
-
-  V removed_val = node_to_remove->val;
-
-  // 3 cases
-  switch(num_children(node_to_remove))
-  {
-    case 0: if(l_of_parent)
-              node_to_removes_parent->l = nullptr;
-            else
-              node_to_removes_parent->r = nullptr;
-            delete node_to_remove;
-            break;
-
-    case 1: if (l_of_parent)
-              if (has_left(node_to_remove))
-                node_to_removes_parent->l = node_to_remove->l;
-              else
-                node_to_removes_parent->l = node_to_remove->r;
-            else
-              if (has_left(node_to_remove))
-                node_to_removes_parent->r = node_to_remove->l;
-              else
-                node_to_removes_parent->r = node_to_remove->r;
-            delete node_to_remove;
-            break;
-
-    case 2: // first find smallest node in right subtree
-            Node *sm_nd = smallest_node(node_to_remove->r);
-            // now get the key and value of the node you need to remove to the smallest nodes pair
-            K new_key = sm_nd->key;
-            V new_val = sm_nd->val;
-
-            // now I need to delete the smallest node
-            ext_remove(sm_nd);
-
-            node_to_remove->key = new_key;
-            node_to_remove->val = new_val;
-            break;
+  bool remove_root = false;
+  if (node_to_remove == root){
+    remove_root = true;
   }
-  return removed_val;
+
+
+
+  if (!remove_root){ // node that you want to remove IS NOT the root
+    Node *node_to_removes_parent = find_parent(root, node_to_remove->key);
+    bool l_of_parent = is_l_of_parent(node_to_remove, node_to_removes_parent);
+    V removed_val = node_to_remove->val;
+
+    // 3 cases
+    switch(num_children(node_to_remove))
+    {
+      case 0: if(l_of_parent)
+                node_to_removes_parent->l = nullptr;
+              else
+                node_to_removes_parent->r = nullptr;
+              delete node_to_remove;
+              break;
+
+      case 1: if (l_of_parent)
+                if (has_left(node_to_remove))
+                  node_to_removes_parent->l = node_to_remove->l;
+                else
+                  node_to_removes_parent->l = node_to_remove->r;
+              else
+                if (has_left(node_to_remove))
+                  node_to_removes_parent->r = node_to_remove->l;
+                else
+                  node_to_removes_parent->r = node_to_remove->r;
+              delete node_to_remove;
+              break;
+
+      case 2: // first find smallest node in right subtree
+              // std::cout << "GOOD GOOD" << std::endl;
+              Node *sm_nd = smallest_node(node_to_remove->r);
+              // std::cout << sm_nd->val << std::endl;
+              // now get the key and value of the node you need to remove to the smallest nodes pair
+              K new_key = sm_nd->key;
+              V new_val = sm_nd->val;
+
+              // now I need to delete the smallest node
+              ext_remove(sm_nd);
+
+              node_to_remove->key = new_key;
+              node_to_remove->val = new_val;
+              break;
+    }
+    return removed_val;
+  } else { // node that you want to remove IS the root
+    V removed_val = node_to_remove->val;
+
+    // 3 cases
+    switch(num_children(node_to_remove))
+    {
+      case 0: delete node_to_remove;
+              root = nullptr;
+              break;
+
+      case 1: if (has_left(node_to_remove))
+              {
+                root = root->l;
+                delete node_to_remove;
+              } else {
+                root = root->r;
+                delete node_to_remove;
+              }
+              break;
+
+      case 2: // first find smallest node in right subtree
+              Node *sm_nd = smallest_node(node_to_remove->r);
+              // now get the key and value of the node you need to remove to the smallest nodes pair
+              K new_key = sm_nd->key;
+              V new_val = sm_nd->val;
+
+              // now I need to delete the smallest node
+              ext_remove(sm_nd);
+
+              node_to_remove->key = new_key;
+              node_to_remove->val = new_val;
+              break;
+    }
+
+    return removed_val;
+  }
 }
 
 // --- ext_remove --- //
@@ -258,7 +303,7 @@ int BSTLEAF<K, V, comparison_fn, equality_fn>::num_children(Node *curr)
 
 // --- find_parent --- //
 template <typename K, typename V, bool (*comparison_fn)( K key1,  K key2 ), bool (*equality_fn)( K key1 ,  K key2)>
-typename BSTLEAF<K, V, comparison_fn, equality_fn>::Node*& BSTLEAF<K, V, comparison_fn, equality_fn>::find_parent(Node *&rt, K key)
+typename BSTLEAF<K, V, comparison_fn, equality_fn>::Node* BSTLEAF<K, V, comparison_fn, equality_fn>::find_parent(Node *&rt, K key)
 {
   // we will only look for its parent if it has more than 1 node in tree
   if(rt->l)
